@@ -9,3 +9,9 @@ router = APIRouter()
 def get_products(db: Session = Depends(get_db)):
     result = db.execute(text("SELECT * FROM products"))
     return result.fetchall()
+
+
+@router.get("/users")
+def get_products(db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT * FROM users"))
+    return result.fetchall()
