@@ -11,13 +11,14 @@ from app.routes.s3 import upload_file_to_s3
 from pydantic import BaseModel
 from typing import Optional
 from app.routes.s3 import generate_signed_url
-
+from fastapi import HTTPException
 
 class ProductResponse(BaseModel):
     id: int
     name: str
     description: Optional[str] = None
     price: float
+    unit: Optional[str] = None
     quantity: Optional[int] = None
     image_url: Optional[str] = None
     image_signed_url: Optional[str] = None
@@ -120,6 +121,7 @@ class ProductCreate(BaseModel):
 async def create_product(
     name: str = Form(...),
     price: float = Form(...),
+    unit: str = Form(...),
     user_id: int = Form(...),
     description: Optional[str] = Form(None),
     quantity: Optional[int] = Form(None),
@@ -128,33 +130,49 @@ async def create_product(
     token_data: dict = Depends(verify_jwt_token)
 ):
     if not name or not name.strip():
-        return {"error": "Product name must not be empty"}
+        raise HTTPException(status_code=400, detail="Product name must not be empty")
     if price is None or price < 0:
-        return {"error": "Price must be a positive number"}
+        raise HTTPException(status_code=400, detail="Price must be a positive number")
+    if not unit or not unit.strip():
+        raise HTTPException(status_code=400, detail="Unit must not be empty")
     if user_id is None or user_id <= 0:
-        return {"error": "user_id must be a positive integer"}
+        raise HTTPException(status_code=400, detail="user_id must be a positive integer")
+
+    # Check if user exists
+    user_check = db.execute(text("SELECT id FROM users WHERE id = :user_id"), {"user_id": user_id}).fetchone()
+    if not user_check:
+        raise HTTPException(status_code=404, detail="User not found")
 
     image_url = None
+    upload_result = None
     if image:
-        upload_result = await upload_file_to_s3(file=image, token_data=token_data)
-        image_url = upload_result.get("file_key")
+        try:
+            upload_result = await upload_file_to_s3(file=image, token_data=token_data)
+            image_url = upload_result.get("file_key")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
-    insert_query = text("""
-        INSERT INTO products (name, description, price, quantity, image_url, user_id)
-        VALUES (:name, :description, :price, :quantity, :image_url, :user_id)
-    """)
-    result = db.execute(insert_query, {
-        "name": name,
-        "description": description,
-        "price": price,
-        "quantity": quantity,
-        "image_url": image_url,
-        "user_id": user_id
-    })
-    db.commit()
-    last_id = result.lastrowid
-    new_product_result = db.execute(text("SELECT * FROM products WHERE id = :id"), {"id": last_id})
-    new_product = new_product_result.fetchone()
+    try:
+        insert_query = text("""
+            INSERT INTO products (name, description, price, unit, quantity, image_url, user_id)
+            VALUES (:name, :description, :price, :unit, :quantity, :image_url, :user_id)
+        """)
+        result = db.execute(insert_query, {
+            "name": name,
+            "description": description,
+            "price": price,
+            "unit": unit,
+            "quantity": quantity,
+            "image_url": image_url,
+            "user_id": user_id
+        })
+        db.commit()
+        last_id = result.lastrowid
+        new_product_result = db.execute(text("SELECT * FROM products WHERE id = :id"), {"id": last_id})
+        new_product = new_product_result.fetchone()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     if new_product:
         product_dict = dict(new_product._mapping)
@@ -166,6 +184,6 @@ async def create_product(
             image_signed_url=image_signed_url
         )
         return response
-    return {"error": "Product creation failed"}
+    raise HTTPException(status_code=500, detail="Product creation failed")
 
 
