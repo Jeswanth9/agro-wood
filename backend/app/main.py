@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine, Base
 from app.models import product  
 from app.models import user
@@ -9,6 +10,14 @@ from app.routes import s3
 from app.routes import orders
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://sturdy-spoon-wrgwv5pvj9qjf57xw-5174.app.github.dev"],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.on_event("startup")
 def startup():
