@@ -138,7 +138,6 @@ async def create_product(
     if user_id is None or user_id <= 0:
         raise HTTPException(status_code=400, detail="user_id must be a positive integer")
 
-    # Check if user exists
     user_check = db.execute(text("SELECT id FROM users WHERE id = :user_id"), {"user_id": user_id}).fetchone()
     if not user_check:
         raise HTTPException(status_code=404, detail="User not found")
@@ -185,5 +184,71 @@ async def create_product(
         )
         return response
     raise HTTPException(status_code=500, detail="Product creation failed")
+
+@router.put("/products/{product_id}", response_model=ProductResponse)
+async def update_product(
+    product_id: int,
+    name: Optional[str] = Form(None),
+    price: Optional[float] = Form(None),
+    unit: Optional[str] = Form(None),
+    description: Optional[str] = Form(None),
+    quantity: Optional[int] = Form(None),
+    image: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    token_data: dict = Depends(verify_jwt_token)
+):
+    product = db.execute(text("SELECT * FROM products WHERE id = :id"), {"id": product_id}).fetchone()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    image_url = product.image_url
+    if image:
+        try:
+            upload_result = await upload_file_to_s3(file=image, token_data=token_data)
+            image_url = upload_result.get("file_key")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
+
+    # Build update fields dynamically to avoid overwriting with None
+    update_fields = []
+    params = {"id": product_id}
+    if name is not None:
+        update_fields.append("name = :name")
+        params["name"] = name
+    if description is not None:
+        update_fields.append("description = :description")
+        params["description"] = description
+    if price is not None:
+        update_fields.append("price = :price")
+        params["price"] = price
+    if unit is not None:
+        update_fields.append("unit = :unit")
+        params["unit"] = unit
+    if quantity is not None:
+        update_fields.append("quantity = :quantity")
+        params["quantity"] = quantity
+    if image_url is not None:
+        update_fields.append("image_url = :image_url")
+        params["image_url"] = image_url
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    update_query = text(f"UPDATE products SET {', '.join(update_fields)} WHERE id = :id")
+    db.execute(update_query, params)
+    db.commit()
+
+    updated_product_result = db.execute(text("SELECT * FROM products WHERE id = :id"), {"id": product_id})
+    updated_product = updated_product_result.fetchone()
+    
+    if updated_product:
+        product_dict = dict(updated_product._mapping)
+        image_signed_url = None
+        if image and upload_result:
+            image_signed_url = upload_result.get("signed_url")
+        return ProductResponse(
+            **product_dict,
+            image_signed_url=image_signed_url
+        )
+    
+    raise HTTPException(status_code=500, detail="Product update failed")
 
 
