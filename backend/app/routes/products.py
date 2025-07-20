@@ -65,7 +65,7 @@ def get_product(
         image_signed_url=signed_url
     )
 
-@router.get("/users/{user_id}/products", response_model=list[ProductResponse])
+@router.get("/owner/{user_id}/products", response_model=list[ProductResponse])
 def get_products_by_user(
     user_id: int,
     db: Session = Depends(get_db),

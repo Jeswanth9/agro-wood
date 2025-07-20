@@ -6,6 +6,7 @@ from app.models import order
 from app.routes import products
 from app.routes import users
 from app.routes import s3
+from app.routes import orders
 
 app = FastAPI()
 
@@ -15,4 +16,5 @@ def startup():
 
 app.include_router(products.router, prefix="/api")
 app.include_router(users.router, prefix="/iam")
-app.include_router(s3.router, prefix="/upload")
+app.include_router(s3.router, prefix="/api")
+app.include_router(orders.router, prefix="/api")
