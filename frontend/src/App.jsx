@@ -9,7 +9,6 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication state when app loads
     const checkAuth = () => {
       const isAuth = isAuthenticated();
       setUser(isAuth ? { isAuthenticated: true } : null);

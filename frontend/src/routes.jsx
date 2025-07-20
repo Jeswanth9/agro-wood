@@ -3,12 +3,10 @@ import Login from './Login';
 import Signup from './Signup';
 
 export default function AppRoutes({ user, setUser }) {
-  // Redirect authenticated users away from auth pages
   const AuthRoute = ({ element }) => {
     return !user ? element : <Navigate to="/" replace />;
   };
 
-  // Protect routes that require authentication
   const ProtectedRoute = ({ element }) => {
     return user ? element : <Navigate to="/login" replace />;
   };
