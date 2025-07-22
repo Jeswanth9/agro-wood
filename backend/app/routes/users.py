@@ -62,7 +62,7 @@ def signup(user: UserCreate = Body(...), db: Session = Depends(get_db)):
     db.commit()
     user_row = db.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchone()
     access_token = create_access_token(data={"sub": username, "user_id": user_row.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user_id": user_row.id}
 
 class UserLogin(BaseModel):
     username: str
@@ -83,4 +83,4 @@ def login(user: UserLogin = Body(...), db: Session = Depends(get_db)):
     if not user_row or not verify_password(password, user_row.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
     access_token = create_access_token(data={"sub": username, "user_id": user_row.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer", "user_id": user_row.id}

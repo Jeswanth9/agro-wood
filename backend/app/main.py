@@ -13,7 +13,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://sturdy-spoon-wrgwv5pvj9qjf57xw-5174.app.github.dev"],
+    allow_origins=["https://sturdy-spoon-wrgwv5pvj9qjf57xw-5173.app.github.dev"],
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers

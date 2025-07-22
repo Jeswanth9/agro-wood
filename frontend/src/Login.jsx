@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiCall } from './api';
 import endpoints from './endpoints';
-import { setToken, isAuthenticated } from './authHelper';
+import { setToken, setUserId, isAuthenticated } from './authHelper';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,6 +30,9 @@ export default function Login({ onLogin }) {
         data: { username, password },
       });
       console.log(response);
+      if (response.user_id) {
+        setUserId(response.user_id);
+      }
       if (response.access_token) {
         setToken(response.access_token);
         if (onLogin) {
@@ -39,6 +42,7 @@ export default function Login({ onLogin }) {
       } else {
         throw new Error('No access token received');
       }
+    
     } catch (err) {
       setError(err.message);
     } finally {

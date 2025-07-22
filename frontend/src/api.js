@@ -8,7 +8,6 @@ export async function apiCall({ url, method = 'GET', data = null, headers = {} }
   const config = {
     method,
     headers: {
-      'Content-Type': 'application/json',
       ...(token && { 'Authorization': `Bearer ${token}` }),
       ...headers,
     },
@@ -16,7 +15,13 @@ export async function apiCall({ url, method = 'GET', data = null, headers = {} }
   };
 
   if (data) {
-    config.body = JSON.stringify(data);
+    // If data is FormData, don't set Content-Type (browser will set it) and don't stringify
+    if (data instanceof FormData) {
+      config.body = data;
+    } else {
+      config.headers['Content-Type'] = 'application/json';
+      config.body = JSON.stringify(data);
+    }
   }
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
   

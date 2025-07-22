@@ -1,0 +1,168 @@
+.home-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background-color: #ffffff;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Drawer Styles */
+.drawer {
+  position: fixed;
+  left: -280px;
+  top: 0;
+  width: 280px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: left 0.3s ease;
+  z-index: 1000;
+}
+
+.drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.drawer-content {
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.drawer-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: #1a1a1a;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.drawer-button:hover {
+  background-color: #f3f4f6;
+}
+
+.button-icon {
+  font-size: 1.25rem;
+  width: 24px;
+}
+
+.close-drawer {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.close-drawer:hover {
+  background-color: #f3f4f6;
+}
+
+/* Drawer Toggle Button */
+.drawer-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem;
+  font-size: 1.25rem;
+  background: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #1a1a1a;
+  transition: background-color 0.2s;
+}
+
+.drawer-toggle:hover {
+  background-color: #f3f4f6;
+}
+
+/* Dashboard Styles */
+.dashboard {
+  flex: 1;
+  padding: 2rem;
+  padding-top: 4rem;
+}
+
+.dashboard h1 {
+  margin-bottom: 2rem;
+  color: #1a1a1a;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.dashboard-content {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.dashboard-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-card.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Overlay */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Responsive Design */
+/* @media (min-width: 1024px) {
+  .drawer-toggle {
+    display: block;
+  }
+
+  .dashboard {
+    margin-left: 0;
+  }
+}ontainer {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  background-color: #ffffff;
+  width: 100vw;
+} */

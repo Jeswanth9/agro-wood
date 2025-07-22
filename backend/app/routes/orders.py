@@ -83,11 +83,29 @@ def create_order(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    # Check if there's enough quantity available
+    if product.quantity < order.quantity:
+        raise HTTPException(status_code=400, detail="Not enough quantity available")
+
     customer = db.execute(text("SELECT * FROM users WHERE id = :id"), {"id": order.customer_id}).fetchone()
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
 
+    # Calculate remaining quantity and total price
+    remaining_quantity = product.quantity - order.quantity
     total_price = float(product.price) * order.quantity
+
+    # Update product quantity
+    update_product_query = text("""
+        UPDATE products 
+        SET quantity = :remaining_quantity 
+        WHERE id = :product_id
+    """)
+    db.execute(update_product_query, {
+        "remaining_quantity": remaining_quantity,
+        "product_id": order.product_id
+    })
+
     insert_query = text("""
         INSERT INTO orders (product_id, customer_id, quantity, total_price)
         VALUES (:product_id, :customer_id, :quantity, :total_price)
