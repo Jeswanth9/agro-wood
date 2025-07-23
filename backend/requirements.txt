@@ -3,3 +3,7 @@ uvicorn
 boto3
 pydantic
 python-dotenv
+passlib[bcrypt]
+PyJWT
+sqlalchemy
+alembic

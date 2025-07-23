@@ -6,6 +6,8 @@ const endpoints = {
     ownerOrders: (userId) => `/api/orders/owner/${userId}`,
     updateOrder: (orderId) => `/api/orders/${orderId}`,
     updateProduct: (productId) => `/api/products/${productId}`,
+    createOrder: `/api/orders`,
+    createProduct: `/api/products`,
 }
 
 export default endpoints;

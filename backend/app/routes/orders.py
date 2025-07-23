@@ -91,20 +91,8 @@ def create_order(
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
 
-    # Calculate remaining quantity and total price
-    remaining_quantity = product.quantity - order.quantity
+    # Calculate total price
     total_price = float(product.price) * order.quantity
-
-    # Update product quantity
-    update_product_query = text("""
-        UPDATE products 
-        SET quantity = :remaining_quantity 
-        WHERE id = :product_id
-    """)
-    db.execute(update_product_query, {
-        "remaining_quantity": remaining_quantity,
-        "product_id": order.product_id
-    })
 
     insert_query = text("""
         INSERT INTO orders (product_id, customer_id, quantity, total_price)
@@ -157,10 +145,26 @@ def update_order(
     update_fields = []
     params = {"id": order_id}
 
+
+    # If status is being set to 'completed' and was not already completed, update product quantity
     if update.status is not None:
         update_fields.append("status = :status")
         update_fields.append("updated_at = NOW()")
         params["status"] = update.status
+
+        if update.status == "completed" and (order.status != "completed"):
+            # Decrement product quantity
+            if product.quantity < order.quantity:
+                raise HTTPException(status_code=400, detail="Not enough quantity available to complete the order")
+            update_product_query = text("""
+                UPDATE products 
+                SET quantity = quantity - :order_quantity
+                WHERE id = :product_id
+            """)
+            db.execute(update_product_query, {
+                "order_quantity": order.quantity,
+                "product_id": order.product_id
+            })
 
     if not update_fields:
         raise HTTPException(status_code=400, detail="No valid fields to update")
