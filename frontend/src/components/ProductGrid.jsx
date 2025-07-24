@@ -52,8 +52,8 @@ export default function ProductGrid({ cart, setCart, products }) {
         {products.map((product) => (
           <div key={product.id} className="product-card professional-card">
             <div className="product-image">
-              {product.image_url ? (
-                <img src={product.image_url} alt={product.name} loading="lazy" />
+              {product.image_signed_url ? (
+                <img src={product.image_signed_url} alt={product.name} loading="lazy" />
               ) : (
                 <div className="no-image">
                   <span className="no-image-icon">📸</span>
