@@ -134,8 +134,8 @@ export default function Cart({ cart, setCart, products }) {
                     {cartItems.map(({ product, quantity, total }) => (
                         <div key={product.id} className="cart-item">
                             <div className="item-image">
-                                {product.image_url ? (
-                                    <img src={product.image_url} alt={product.name} />
+                                {product.image_signed_url ? (
+                                    <img src={product.image_signed_url} alt={product.name} />
                                 ) : (
                                     <div className="no-image">No image</div>
                                 )}
