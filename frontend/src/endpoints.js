@@ -1,3 +1,4 @@
+// using these endpoints
 const endpoints = {
     login: `/iam/login`,
     signup: `/iam/signup`,

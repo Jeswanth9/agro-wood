@@ -13,6 +13,7 @@ S3_BUCKET_NAME = "agro-wood-bucket"
 S3_UPLOAD_FOLDER = "product-images"
 SIGNED_URL_EXPIRATION = 3600
 
+# this function generate signed url so that public can access
 def generate_signed_url(s3_key: str):
     if not s3_key:
         return None
@@ -27,7 +28,7 @@ def generate_signed_url(s3_key: str):
     except Exception:
         return None
 
-
+# this route is used to upload files to S3
 @router.post("/upload-file")
 async def upload_file_to_s3(
     file: UploadFile = File(...),

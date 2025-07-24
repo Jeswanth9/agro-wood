@@ -30,6 +30,7 @@ class OrderCreate(BaseModel):
 class OrderUpdate(BaseModel):
     status: str
 
+# using this model to format the response in api
 class OrderResponse(BaseModel):
     id: int
     product_id: int
@@ -44,7 +45,7 @@ class OrderResponse(BaseModel):
     owner: Optional[dict] = None
 
 
-
+# this is helper function to build the response model
 def build_order_response(order_row, db: Session) -> OrderResponse:
     order_dict = dict(order_row._mapping)
 
@@ -72,7 +73,7 @@ def build_order_response(order_row, db: Session) -> OrderResponse:
 
     return OrderResponse(**order_dict)
 
-
+# this route used to create a new order
 @router.post("/orders", response_model=OrderResponse)
 def create_order(
     order: OrderCreate = Body(...),
@@ -83,7 +84,7 @@ def create_order(
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    # Check if there's enough quantity available
+    # checking if product is available
     if product.quantity < order.quantity:
         raise HTTPException(status_code=400, detail="Not enough quantity available")
 
@@ -91,7 +92,7 @@ def create_order(
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
 
-    # Calculate total price
+    # calculate total price
     total_price = float(product.price) * order.quantity
 
     insert_query = text("""
@@ -112,7 +113,7 @@ def create_order(
 
     return build_order_response(new_order, db)
 
-
+# this route used to get order details by order id
 @router.get("/orders/{order_id}", response_model=OrderResponse)
 def get_order(
     order_id: int,
@@ -124,7 +125,7 @@ def get_order(
         raise HTTPException(status_code=404, detail="Order not found")
     return build_order_response(order, db)
 
-
+# this route used to update an order
 @router.put("/orders/{order_id}", response_model=OrderResponse)
 def update_order(
     order_id: int,
@@ -146,7 +147,7 @@ def update_order(
     params = {"id": order_id}
 
 
-    # If status is being set to 'completed' and was not already completed, update product quantity
+    # when status completed, adjust product quantity
     if update.status is not None:
         update_fields.append("status = :status")
         update_fields.append("updated_at = NOW()")

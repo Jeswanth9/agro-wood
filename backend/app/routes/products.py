@@ -13,6 +13,7 @@ from typing import Optional
 from app.routes.s3 import generate_signed_url
 from fastapi import HTTPException
 
+# using this modl to define response
 class ProductResponse(BaseModel):
     id: int
     name: str
@@ -28,7 +29,7 @@ class ProductResponse(BaseModel):
 
 router = APIRouter()
 
-
+# this route is used to get all products
 @router.get("/products", response_model=list[ProductResponse])
 def get_products(
     db: Session = Depends(get_db),
@@ -47,6 +48,7 @@ def get_products(
         products.append(product)
     return products
 
+# this route is used to get a product by id
 @router.get("/products/{product_id}", response_model=ProductResponse)
 def get_product(
     product_id: int,
@@ -65,6 +67,7 @@ def get_product(
         image_signed_url=signed_url
     )
 
+# this route is used to get products by user id
 @router.get("/owner/{user_id}/products", response_model=list[ProductResponse])
 def get_products_by_user(
     user_id: int,
@@ -84,8 +87,7 @@ def get_products_by_user(
         products.append(product)
     return products
 
-
-
+# this model also validates inputs
 class ProductCreate(BaseModel):
     name: str
     description: Optional[str] = None
@@ -116,7 +118,7 @@ class ProductCreate(BaseModel):
         return v
 
 
-
+# this route is used to create a product
 @router.post("/products")
 async def create_product(
     name: str = Form(...),
@@ -185,6 +187,7 @@ async def create_product(
         return response
     raise HTTPException(status_code=500, detail="Product creation failed")
 
+# this route is used to update a product
 @router.put("/products/{product_id}", response_model=ProductResponse)
 async def update_product(
     product_id: int,
@@ -209,7 +212,6 @@ async def update_product(
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
-    # Build update fields dynamically to avoid overwriting with None
     update_fields = []
     params = {"id": product_id}
     if name is not None:

@@ -13,7 +13,7 @@ export default function Signup({ onLogin }) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  // using to validate and call the signup api 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

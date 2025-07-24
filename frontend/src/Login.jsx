@@ -17,7 +17,7 @@ export default function Login({ onLogin }) {
       navigate('/');
     }
   }, [navigate]);
-
+  // using this to log in the user
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

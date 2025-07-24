@@ -24,12 +24,13 @@ const Profile = () => {
   });
   const navigate = useNavigate();
 
-  // Header actions
+  // logout function
   const handleLogout = () => {
     removeToken();
     navigate('/login');
   };
 
+  // using this to update the order status as completed
   const handleUpdateOrder = async (orderId) => {
     setUpdating(true);
     try {
@@ -77,14 +78,12 @@ const Profile = () => {
 
     try {
       if (editingProduct && editingProduct.id) {
-        // Update existing product
         await apiCall({
           url: endpoints.updateProduct(editingProduct.id),
           method: 'PUT',
           data: formData,
         });
       } else {
-        // Add new product
         formData.append('user_id', getUserId());
         await apiCall({
           url: endpoints.createProduct,
@@ -123,7 +122,6 @@ const Profile = () => {
       setSellingProducts(response || []);
     } catch (err) {
       console.error('Error fetching products:', err);
-      // setError(err.message);
     } finally {
       setLoading(false);
     }

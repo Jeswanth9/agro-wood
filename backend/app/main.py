@@ -10,7 +10,7 @@ from app.routes import s3
 from app.routes import orders
 
 app = FastAPI()
-
+# this is imp to allow CORS for frontend development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,8 +21,8 @@ app.add_middleware(
         "http://127.0.0.1:3000"
     ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.on_event("startup")

@@ -51,14 +51,12 @@ export default function Cart({ cart, setCart, products }) {
         });
     };
 
-    // Manual clear with confirmation
     const clearCart = () => {
         if (window.confirm('Are you sure you want to clear your cart?')) {
             setCart({});
         }
     };
 
-    // Silent clear for post-purchase
     const clearCartSilent = () => {
         setCart({});
     };
@@ -73,7 +71,7 @@ export default function Cart({ cart, setCart, products }) {
         const customerId = parseInt(getUserId());
 
         try {
-            // Create orders for each cart item
+            // creating orders for each item
             const orderPromises = cartItems.map(async (item) => {
                 const orderData = {
                     product_id: item.product.id,
@@ -92,7 +90,7 @@ export default function Cart({ cart, setCart, products }) {
 
             alert(`🎉 Thank you for your purchase!\nYou bought ${totalItems} item${totalItems > 1 ? 's' : ''} for a total of ₹${totalPrice.toLocaleString('en-IN')}.\nYour order is being processed.`);
             clearCartSilent();
-            navigate('/profile'); // Navigate to profile to see orders
+            navigate('/profile');
         } catch (error) {
             console.error('Purchase failed:', error);
             alert('Oops! Something went wrong with your purchase. Please try again.');

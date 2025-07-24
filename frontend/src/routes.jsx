@@ -6,12 +6,12 @@ import Profile from './components/Profile';
 import Cart from './components/Cart';
 
 export default function AppRoutes({ user, setUser, cart, setCart, products, setProducts }) {
-  // Redirect authenticated users away from auth pages
+  // wrapper to ensure user is not logged in to access auth routes
   const AuthRoute = ({ element }) => {
     return !user ? element : <Navigate to="/" replace />;
   };
 
-  // Protect routes that require authentication
+  // protected route to ensure logout if user is not auth
   const ProtectedRoute = ({ element }) => {
     return user ? element : <Navigate to="/login" replace />;
   };

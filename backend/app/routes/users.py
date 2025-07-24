@@ -17,6 +17,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# this fucntion creates a jwt access token
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
@@ -30,6 +31,7 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
+# user model validation 
 class UserCreate(BaseModel):
     username: str
     password: str
@@ -41,7 +43,7 @@ class UserCreate(BaseModel):
             raise ValueError(f"{info.field_name} must not be empty")
         return v
 
-
+# this route handles user signup
 @router.post("/signup")
 def signup(user: UserCreate = Body(...), db: Session = Depends(get_db)):
     username = user.username
@@ -74,6 +76,7 @@ class UserLogin(BaseModel):
             raise ValueError(f"{info.field_name} must not be empty")
         return v
 
+# this route handles user login
 @router.post("/login")
 def login(user: UserLogin = Body(...), db: Session = Depends(get_db)):
     username = user.username

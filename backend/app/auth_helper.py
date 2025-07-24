@@ -4,6 +4,7 @@ import jwt
 SECRET_KEY = "agrowood"
 ALGORITHM = "HS256"
 
+# this function is used to verify the jwt token
 def verify_jwt_token(authorization: str = Header(...)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
